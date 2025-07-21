@@ -1,0 +1,39 @@
+name: 🟡 Pac-Man Contribution Graph
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs every day at midnight
+  workflow_dispatch:    # Allow manual trigger
+
+jobs:
+  generate-pacman-graph:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout repo
+      uses: actions/checkout@v3
+
+    - name: ⚙️ Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: 📦 Install Pac-Man Graph Generator
+      run: |
+        git clone https://github.com/ashutosh00710/github-readme-activity-graph.git
+        cd github-readme-activity-graph
+        npm install
+
+    - name: 🔄 Generate graph
+      run: |
+        cd github-readme-activity-graph
+        node index.js --username YOUR_GITHUB_USERNAME --theme github --animation pacman --output ../animation.md
+
+    - name: 📤 Commit and push
+      run: |
+        git config user.name 'github-actions[bot]'
+        git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+        mv animation.md ./animation.md
+        git add animation.md
+        git commit -m "chore: update Pac-Man contribution graph"
+        git push
